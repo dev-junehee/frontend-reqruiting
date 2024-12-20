@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { VALIDATION, ALERT, BUTTON, SIGN_UP } from "@/constants";
 import InputText from "./InputText.vue";
 
 // InputText 입력 내용
@@ -22,14 +23,14 @@ const errorMessage = ref({
 // 긱 힝목의 유효성 검사 함수
 const validUserId = (id: string) => {
   if (!id) {
-    errorMessage.value.userId = "아이디는 필수 입력입니다."
+    errorMessage.value.userId = VALIDATION.userId.required;
     isValidUserId.value = false;
     return
   }
 
-  const regexp = /^[a-zA-Z0-9]+$/;
+  const regexp = VALIDATION.userId.regexp;
   if (!regexp.test(id)) {
-    errorMessage.value.userId = "아이디는 영문과 숫자만 가능합니다."
+    errorMessage.value.userId = VALIDATION.userId.error;
     isValidUserId.value = false;
     return
   }
@@ -40,14 +41,14 @@ const validUserId = (id: string) => {
 
 const validName = (name: string) => {
   if (!name) {
-    errorMessage.value.name = "이름은 필수 입력입니다."
+    errorMessage.value.name = VALIDATION.name.required
     isValidName.value = false;
     return
   }
 
-  const regexp = /[\\/:*?"<>|]/;
+  const regexp = VALIDATION.name.regexp
   if (regexp.test(name)) {
-    errorMessage.value.name = `이름에 "\\ / : * ? " < > " 은 사용할 수 없습니다.`
+    errorMessage.value.name = VALIDATION.name.error
     isValidName.value = false;
     return
   }
@@ -57,9 +58,9 @@ const validName = (name: string) => {
 }
 
 const validOrganization = (organization: string) => {
-  const regexp = /[\\/:*?"<>|]/;
+  const regexp = VALIDATION.organization.regexp
   if (regexp.test(organization)) {
-    errorMessage.value.organization = `조직명에 "\\ / : * ? " < > " 은 사용할 수 없습니다.`
+    errorMessage.value.organization = VALIDATION.organization.error
     isValidOrganization.value = false;
     return
   }
@@ -89,7 +90,7 @@ const handleSubmit = () => {
   
   if (isValidUserId.value && isValidName.value && isValidOrganization.value) {
     alert(`
-      회원가입에 성공했어요!
+      ${ALERT.signUp.success}
       
       User ID: ${userId.value}
       Name: ${name.value}
@@ -97,11 +98,11 @@ const handleSubmit = () => {
 `   );
   } else {
     alert(`
-      입력값이 유효한지 다시 확인해 주세요!
+      ${ALERT.signUp.invalid}
 
-      User ID: ${errorMessage.value.userId}
-      Name: ${errorMessage.value.name}
-      Organization: ${errorMessage.value.organization}
+      User ID: ${isValidUserId.value ? "OK!" : errorMessage.value.userId}
+      Name: ${isValidName.value ? "OK!" : errorMessage.value.name}
+      ${isValidOrganization.value ? "" : `Organization: ${errorMessage.value.organization}`}
     `)
   }
 };
@@ -110,17 +111,17 @@ const handleSubmit = () => {
 <template>
   <form class="flex flex-col gap-4 py-4" @submit.prevent="handleSubmit">
     <div class="flex flex-col">
-      <InputText label="User ID" v-model="userId" />
+      <InputText :label="SIGN_UP.userId" v-model="userId" />
       <div v-show="!isValidUserId" class="text-xs text-red-400">{{ errorMessage.userId }}</div>
     </div>
     <div class="flex flex-col">
-      <InputText label="Name" v-model="name" />
+      <InputText :label="SIGN_UP.name" v-model="name" />
       <div v-show="!isValidName" class="text-xs text-red-400">{{ errorMessage.name }}</div>
     </div>
     <div class="flex flex-col">
-      <InputText label="Organization" v-model="organization" />
+      <InputText :label="SIGN_UP.organization" v-model="organization" />
       <div v-show="!isValidOrganization" class="text-xs text-red-400">{{ errorMessage.organization }}</div>
     </div>
-    <button class="bg-blue-500 text-white px-4 py-2 rounded-md">Submit</button>
+    <button class="bg-blue-500 text-white px-4 py-2 rounded-md">{{ BUTTON.submit }}</button>
   </form>
 </template>
