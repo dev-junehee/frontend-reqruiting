@@ -18,13 +18,13 @@ const handleInputFocus = () => {
   if (model.value !== '') isShow.value = true;
 }
 
-const handleInputBlur = (event: FocusEvent) => {
-  if (isFocus.value && model.value !== '') {
-    event.preventDefault();
-    return;
-  }
-  isFocus.value = false;
-  isShow.value = false;
+const handleInputBlur = () => {
+  // X버튼이 클릭되면 Input Focus가 해제되기 때문에 X버튼을 클릭하지 못하는 이슈 발생
+  // Blur 함수 실행 시점을 뒤로 지연시켜 X버튼이 클릭될 수 있는 시점 제공
+  setTimeout(() => {
+    isFocus.value = false;
+    isShow.value = false;
+  }, 100);
 }
 
 const handleXButtonClick = (event: MouseEvent) => {
@@ -33,11 +33,13 @@ const handleXButtonClick = (event: MouseEvent) => {
   isShow.value = false;
 }
 
-watch(model, () => {
+watch([model, isFocus], ([newModel, newIsFocus]) => {
   // InputText에 포커스가 있고, 내용을 입력 중일 때 X버튼 표시
-  if (isFocus.value && model.value !== '') isShow.value = true;
-  else if (!isFocus.value && model.value) isShow.value = false;
-  else isShow.value = false;
+  if (newIsFocus && newModel !== '') {
+    isShow.value = true;
+  } else {
+    isShow.value = false;
+  }
 });
 </script>
 
